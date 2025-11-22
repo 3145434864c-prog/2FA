@@ -1,0 +1,13 @@
+# Proteger directorios (evita listar archivos)
+Options -Indexes
+
+# Activar motor de reescritura
+RewriteEngine On
+
+# No reescribir si el archivo o directorio existe
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Rutas amigables: /usuarios → index.php?route=usuarios
+RewriteRule ^([a-zA-Z0-9\-_]+)$ index.php?route=$1 [QSA,L]
+

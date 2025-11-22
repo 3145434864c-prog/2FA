@@ -1,0 +1,221 @@
+/* =========================
+   General: centrado y fondo
+   ========================= */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Arial", sans-serif;
+  background: linear-gradient(0deg, #070707 0%, #253447 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* =========================
+   Contenedor principal
+   ========================= */
+.container {
+  max-width: 450px;
+  width: 100%;
+  background: linear-gradient(0deg, #FFFFFF 0%, #F4F7FB 100%);
+  border-radius: 40px;
+  padding: 25px 35px;
+  border: 5px solid #FFFFFF;
+  box-shadow: rgba(16, 64, 87, 0.88) 0px 30px 30px -20px;
+  margin: 20px;
+  text-align: center;
+}
+
+/* =========================
+   Título principal
+   ========================= */
+.heading {
+  font-weight: 900;
+  font-size: 30px;
+  color: rgb(16, 137, 211); /* color de marca */
+}
+
+/* =========================
+   Formulario
+   ========================= */
+.form {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.form .input {
+  width: 100%;
+  background: white;
+  border: none;
+  padding: 15px 20px;
+  border-radius: 20px;
+  margin-top: 15px;
+  box-shadow: #cff0ff 0px 10px 10px -5px;
+  border-inline: 2px solid transparent;
+  font-size: 15px;
+}
+
+.form .input::placeholder {
+  color: rgb(170, 170, 170);
+}
+
+.form .input:focus {
+  outline: none;
+  border-inline: 2px solid #12B1D1;
+}
+
+/* =========================
+   Botón de login
+   ========================= */
+.form .login-button {
+  display: block;
+  width: 100%;
+  font-weight: bold;
+  background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+  color: white;
+  padding-block: 15px;
+  margin: 20px auto;
+  border-radius: 20px;
+  box-shadow: rgba(133, 189, 215, 0.88) 0px 20px 10px -15px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.form .login-button:hover {
+  transform: scale(1.03);
+  box-shadow: rgba(133, 189, 215, 0.88) 0px 23px 10px -20px;
+}
+
+.form .login-button:active {
+  transform: scale(0.95);
+  box-shadow: rgba(133, 189, 215, 0.88) 0px 15px 10px -10px;
+}
+
+/* =========================
+   Links
+   ========================= */
+.forgot-password {
+  display: block;
+  width: 100%;
+  text-align: left;
+  margin-top: 10px;
+}
+
+.forgot-password a,
+.crear-cuenta,
+.volver-principal,
+.agreement a {
+  text-decoration: none;
+  color: #0099ff;
+  font-size: 12px;
+  transition: color 0.3s ease;
+}
+
+.forgot-password a:hover,
+.crear-cuenta:hover,
+.volver-principal:hover,
+.agreement a:hover {
+  color: rgb(16, 137, 211);
+}
+
+.crear-cuenta,
+.volver-principal {
+  display: inline-block;
+  margin-top: 15px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  background-color: #252525;
+  color: #fafafa;
+  font-weight: bold;
+}
+
+.volver-principal {
+  display: inline-block;
+}
+
+/* =========================
+   Mensaje de validación
+   ========================= */
+#mensaje {
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: bold;
+  color: red;
+  min-height: 20px;
+}
+
+/* =========================
+   Social login
+   ========================= */
+.social-account-container {
+  margin-top: 25px;
+}
+
+.social-account-container .title {
+  display: block;
+  text-align: center;
+  font-size: 10px;
+  color: rgb(170, 170, 170);
+}
+
+.social-account-container .social-accounts {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 5px;
+}
+
+.social-account-container .social-accounts .social-button {
+  background: linear-gradient(45deg, rgb(0,0,0) 0%, rgb(112,112,112) 100%);
+  border: 5px solid white;
+  padding: 5px;
+  border-radius: 50%;
+  width: 40px;
+  aspect-ratio: 1;
+  display: grid;
+  place-content: center;
+  box-shadow: rgba(133, 189, 215, 0.88) 0px 12px 10px -8px;
+  transition: all 0.2s ease-in-out;
+}
+
+.social-account-container .social-accounts .social-button:hover {
+  transform: scale(1.2);
+}
+
+.social-account-container .social-accounts .social-button:active {
+  transform: scale(0.9);
+}
+
+/* =========================
+   Responsive
+   ========================= */
+@media (max-width: 480px) {
+  .container {
+    width: 90%;
+    padding: 20px 25px;
+  }
+
+  .heading {
+    font-size: 24px;
+  }
+
+  .form .input {
+    padding: 12px 15px;
+  }
+
+  .form .login-button {
+    padding-block: 12px;
+  }
+
+  .forgot-password a,
+  .crear-cuenta,
+  .volver-principal,
+  .agreement a {
+    font-size: 11px;
+  }
+}
