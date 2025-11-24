@@ -1,5 +1,7 @@
 <?php
 require_once "Modelos/ModeloUsuarios.php";
+require_once "Modelos/Funciones2FA.php";
+
 
 class ControladorUsuarios {
 
@@ -259,6 +261,27 @@ public function ingresoUsuario(): void {
 </script>";
         exit;
     }
+
+require_once "Modelos/Funciones2FA.php";
+
+$enviado = sendOtpEmail($usuario['id_usuario'], $usuario['email_usuario']);
+
+if ($enviado) {
+    // Guardar temporalmente el ID de usuario en sesión para 2FA
+    $_SESSION['2fa_user_id'] = $usuario['id_usuario'];
+    header('Location: 2fa'); // página donde se ingresa OTP
+    exit;
+} else {
+    echo "<script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'No se pudo enviar el código de verificación.'
+        });
+    </script>";
+    return;
+}
+
 
     // ===================================================
     // Login exitoso → iniciar sesión

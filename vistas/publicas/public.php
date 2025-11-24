@@ -6,7 +6,7 @@
 if (isset($_GET["route"])) {
 
     // Lista de rutas permitidas
-    $rutasPermitidas = ["inicio", "registro", "equipo", "productos", "ingreso", "recuperar", "recuperar_confirmar"];
+    $rutasPermitidas = ["inicio", "registro", "equipo", "productos", "ingreso", "recuperar", "recuperar_confirmar", "2fa"];
 
     if (in_array($_GET["route"], $rutasPermitidas)) {
 
