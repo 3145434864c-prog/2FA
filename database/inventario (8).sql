@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 15-11-2025 a las 19:04:05
+-- Tiempo de generación: 24-11-2025 a las 20:48:15
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -45,6 +45,37 @@ INSERT INTO `categorias` (`id_categoria`, `nombre_categoria`, `fyh_creacion_cate
 (14, 'Selladores', '2025-10-23 14:25:43'),
 (17, 'Impresoras', '2025-11-08 20:09:43'),
 (18, 'Consolas', '2025-11-08 20:20:37');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `email_2fa`
+--
+
+CREATE TABLE `email_2fa` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `otp` varchar(6) NOT NULL,
+  `expires_at` datetime NOT NULL,
+  `used` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `email_2fa`
+--
+
+INSERT INTO `email_2fa` (`id`, `user_id`, `otp`, `expires_at`, `used`, `created_at`) VALUES
+(1, 1, '416891', '2025-11-23 01:16:23', 1, '2025-11-23 00:11:23'),
+(2, 1, '817402', '2025-11-23 01:18:18', 1, '2025-11-23 00:13:18'),
+(3, 1, '246490', '2025-11-23 01:23:17', 1, '2025-11-23 00:18:17'),
+(4, 1, '751481', '2025-11-23 01:26:20', 1, '2025-11-23 00:21:20'),
+(5, 1, '176980', '2025-11-23 01:28:49', 1, '2025-11-23 00:23:49'),
+(6, 1, '555941', '2025-11-23 01:34:23', 1, '2025-11-23 00:29:23'),
+(7, 1, '040103', '2025-11-23 01:38:54', 1, '2025-11-23 00:33:54'),
+(8, 1, '335420', '2025-11-23 01:45:34', 1, '2025-11-23 00:40:34'),
+(9, 1, '827064', '2025-11-23 01:47:51', 0, '2025-11-23 00:42:51'),
+(10, 2, '069245', '2025-11-23 01:50:17', 0, '2025-11-23 00:45:17');
 
 -- --------------------------------------------------------
 
@@ -131,17 +162,21 @@ CREATE TABLE `usuarios` (
   `foto_usuario` varchar(255) NOT NULL,
   `estado_usuario` int(11) NOT NULL,
   `ultimo_login` datetime NOT NULL,
-  `fyh_creacion_usuario` timestamp NOT NULL DEFAULT current_timestamp()
+  `fyh_creacion_usuario` timestamp NOT NULL DEFAULT current_timestamp(),
+  `firebase_uid` varchar(255) DEFAULT NULL,
+  `totp_enabled` tinyint(1) NOT NULL DEFAULT 0,
+  `firebase_totp_id` varchar(255) DEFAULT NULL,
+  `recovery_codes_hash` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`recovery_codes_hash`))
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Volcado de datos para la tabla `usuarios`
 --
 
-INSERT INTO `usuarios` (`id_usuario`, `nombre_usuario`, `email_usuario`, `password_usuario`, `perfil_usuario`, `foto_usuario`, `estado_usuario`, `ultimo_login`, `fyh_creacion_usuario`) VALUES
-(1, 'Cesar David', 'Admin@gmail.com', '$argon2id$v=19$m=131072,t=4,p=2$OTNoT1R1d25YRnRnRzExcw$WsnQ6C6f0DwZHyiEgtKncMlvKheMg0LiEgK4DlCb8yQ', 'administrador', 'vistas/recursos/img/usuarios/690f6c9ad8adb_foto_cesar.jpeg', 1, '0000-00-00 00:00:00', '2025-11-08 16:15:23'),
-(2, 'usuario x', '3145434864c@gmail.com', '$argon2id$v=19$m=131072,t=4,p=2$cy5kQzJ1WGhDTzhVZGhKdA$Mf0QgC4qHH0IBWM839L+e9WWyWfS6LX/LuLV/tB75n4', 'administrador', 'vistas/recursos/img/usuarios/690f46c000553_usuariox.jpg', 1, '0000-00-00 00:00:00', '2025-11-08 13:21:51'),
-(16, 'Guacamayo', 'Guacamayo123!@gmail.com', '$argon2id$v=19$m=131072,t=4,p=2$T2lCRUwwaGE4eGt4TkFwWg$/M7PxE4+hQrFPVoS81+eOs0UOxKuaoQueIo2yE9dfQw', 'administrador', 'vistas/recursos/img/usuarios/691760f945f24_guacamayo.jpg', 1, '0000-00-00 00:00:00', '2025-11-14 16:47:31');
+INSERT INTO `usuarios` (`id_usuario`, `nombre_usuario`, `email_usuario`, `password_usuario`, `perfil_usuario`, `foto_usuario`, `estado_usuario`, `ultimo_login`, `fyh_creacion_usuario`, `firebase_uid`, `totp_enabled`, `firebase_totp_id`, `recovery_codes_hash`) VALUES
+(1, 'Cesar David', 'Admin@gmail.com', '$argon2id$v=19$m=131072,t=4,p=2$OTNoT1R1d25YRnRnRzExcw$WsnQ6C6f0DwZHyiEgtKncMlvKheMg0LiEgK4DlCb8yQ', 'administrador', 'vistas/recursos/img/usuarios/690f6c9ad8adb_foto_cesar.jpeg', 1, '0000-00-00 00:00:00', '2025-11-08 16:15:23', 'test_firebase_uid_123', 1, 'totp_sim_6f23879bdcfe', NULL),
+(2, 'usuario x', '3145434864c@gmail.com', '$argon2id$v=19$m=131072,t=4,p=2$cy5kQzJ1WGhDTzhVZGhKdA$Mf0QgC4qHH0IBWM839L+e9WWyWfS6LX/LuLV/tB75n4', 'administrador', 'vistas/recursos/img/usuarios/690f46c000553_usuariox.jpg', 1, '0000-00-00 00:00:00', '2025-11-08 13:21:51', NULL, 0, NULL, NULL),
+(16, 'Guacamayo', 'Guacamayo123!@gmail.com', '$argon2id$v=19$m=131072,t=4,p=2$T2lCRUwwaGE4eGt4TkFwWg$/M7PxE4+hQrFPVoS81+eOs0UOxKuaoQueIo2yE9dfQw', 'administrador', 'vistas/recursos/img/usuarios/691760f945f24_guacamayo.jpg', 1, '0000-00-00 00:00:00', '2025-11-14 16:47:31', NULL, 0, NULL, NULL);
 
 --
 -- Índices para tablas volcadas
@@ -152,6 +187,13 @@ INSERT INTO `usuarios` (`id_usuario`, `nombre_usuario`, `email_usuario`, `passwo
 --
 ALTER TABLE `categorias`
   ADD PRIMARY KEY (`id_categoria`);
+
+--
+-- Indices de la tabla `email_2fa`
+--
+ALTER TABLE `email_2fa`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indices de la tabla `password_resets`
@@ -188,6 +230,12 @@ ALTER TABLE `categorias`
   MODIFY `id_categoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
+-- AUTO_INCREMENT de la tabla `email_2fa`
+--
+ALTER TABLE `email_2fa`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+
+--
 -- AUTO_INCREMENT de la tabla `password_resets`
 --
 ALTER TABLE `password_resets`
@@ -208,6 +256,12 @@ ALTER TABLE `usuarios`
 --
 -- Restricciones para tablas volcadas
 --
+
+--
+-- Filtros para la tabla `email_2fa`
+--
+ALTER TABLE `email_2fa`
+  ADD CONSTRAINT `email_2fa_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE;
 
 --
 -- Filtros para la tabla `password_resets`
