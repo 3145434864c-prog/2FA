@@ -123,7 +123,9 @@ class Controlador2FA
             }
 
             // Setear las mismas variables de sesión que tu login normal
-            $_SESSION['admin'] = $usuario['perfil_usuario'] === 'administrador' ? 'ok' : '';
+            // $_SESSION['admin'] = $usuario['perfil_usuario'] === 'administrador' ? 'ok' : '';
+            $_SESSION['admin'] = 'ok';
+            $_SESSION['rol'] = $usuario['perfil_usuario'];
             $_SESSION['usuario_id'] = $usuario['id_usuario'];
             $_SESSION['usuario_nombre'] = $usuario['nombre_usuario'];
             $_SESSION['usuario_foto'] = !empty($usuario['foto_usuario'])
@@ -140,7 +142,7 @@ class Controlador2FA
             $pdo->commit();
 
             // Redirigir EXACTAMENTE como pediste
-            header('Location: index.php?route=inicio');
+            header('Location: index.php?route=dashboard');
             exit;
         } catch (Exception $e) {
             if ($pdo->inTransaction()) $pdo->rollBack();

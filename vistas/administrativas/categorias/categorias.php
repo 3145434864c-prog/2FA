@@ -12,9 +12,17 @@
     </h1>
 
     <!-- Botón: Agregar categoría (abre modal) -->
-    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalCategoria">
+    <!-- <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalCategoria">
       <i class="fas fa-plus me-1"></i> Nueva categoría
-    </button>
+    </button> -->
+
+<?php if ($_SESSION['rol'] === 'administrador' || $_SESSION['rol'] === 'editor'): ?>
+<button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalCategoria">
+  <i class="fas fa-plus me-1"></i> Nueva categoría
+</button>
+<?php endif; ?>
+
+
   </div>
 
   <!-- Descripción -->
@@ -51,28 +59,43 @@
                   $id   = isset($cat['id_categoria']) ? (int)$cat['id_categoria'] : 0;
                   $name = htmlspecialchars($cat['nombre_categoria'] ?? '', ENT_QUOTES, 'UTF-8');
 
-                  echo '<tr data-id="'.$id.'">
-                          <td class="text-center">'.$i.'</td>
-                          <td>'.$name.'</td>
-                          <td class="text-nowrap text-center">
-                            <button class="btn btn-outline-primary btn-sm me-1" data-bs-toggle="tooltip" title="Editar categoría" data-action="edit" data-id="'.$id.'">
-                              <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-outline-danger btn-sm" data-bs-toggle="tooltip" title="Eliminar categoría" data-action="delete" data-id="'.$id.'">
-                              <i class="fas fa-trash"></i>
-                            </button>
-                          </td>
-                        </tr>';
-                  $i++;
-                }
-              } else {
-                echo '<tr>
-                        <td colspan="3" class="text-center text-muted">
-                          No hay categorías registradas.
-                        </td>
-                      </tr>';
-              }
-            ?>
+                  // Base del botón de fila
+                  $botonesHtml = '';
+
+                  // Según el rol, agregamos botones
+                  if ($_SESSION['rol'] === 'administrador') {
+                      $botonesHtml .= '<button class="btn btn-outline-primary btn-sm me-1" data-bs-toggle="tooltip" title="Editar categoría" data-action="edit" data-id="'.$id.'">
+                                          <i class="fas fa-edit"></i>
+                                      </button>';
+                      $botonesHtml .= '<button class="btn btn-outline-danger btn-sm" data-bs-toggle="tooltip" title="Eliminar categoría" data-action="delete" data-id="'.$id.'">
+                                          <i class="fas fa-trash"></i>
+                                      </button>';
+                  } elseif ($_SESSION['rol'] === 'editor') {
+                      $botonesHtml .= '<button class="btn btn-outline-primary btn-sm me-1" data-bs-toggle="tooltip" title="Editar categoría" data-action="edit" data-id="'.$id.'">
+                                          <i class="fas fa-edit"></i>
+                                      </button>';
+                  } else {
+                      $botonesHtml = '--';
+                  }
+
+                  // Construir la fila completa
+                  $botones = '<tr data-id="'.$id.'">
+                                  <td class="text-center">'.$i.'</td>
+                                  <td>'.$name.'</td>
+                                  <td class="text-nowrap text-center">'.$botonesHtml.'</td>
+                              </tr>';
+
+                      echo $botones;
+                      $i++;
+                    }
+                  } else {
+                    echo '<tr>
+                            <td colspan="3" class="text-center text-muted">
+                              No hay categorías registradas.
+                            </td>
+                          </tr>';
+                  }
+                ?>
           </tbody>
           <tfoot class="thead-light">
             <tr>

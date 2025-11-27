@@ -3,7 +3,6 @@
 // Se asume que la sesión contiene: $_SESSION['2fa_user_id']
 // Si no existe, redirigir al login para evitar acceso directo.
 
-session_start();
 if (!isset($_SESSION['2fa_user_id'])) {
     header("Location: login");
     exit();
@@ -19,64 +18,154 @@ if (!isset($_SESSION['2fa_user_id'])) {
     <!-- SWEETALERT 2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <style>
-        body {
-            background: #f4f6f9;
-            font-family: Arial, sans-serif;
-        }
-        .otp-container {
-            max-width: 420px;
-            margin: 90px auto;
-            padding: 35px;
-            background: white;
-            border-radius: 14px;
-            box-shadow: 0 4px 14px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        .otp-title {
-            font-size: 22px;
-            margin-bottom: 10px;
-            font-weight: bold;
-        }
-        .otp-inputs {
-            display: flex;
-            justify-content: space-between;
-            margin: 25px 0;
-        }
-        .otp-input {
-            width: 48px;
-            height: 55px;
-            font-size: 26px;
-            text-align: center;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-        }
-        .btn-otp {
-            background: #34495e;
-            border: none;
-            width: 100%;
-            padding: 14px;
-            color: white;
-            font-size: 17px;
-            cursor: pointer;
-            border-radius: 8px;
-            margin-top: 20px;
-        }
-        .btn-otp:hover {
-            background: #2c3e50;
-        }
-        .resend {
-            margin-top: 15px;
-            color: #2980b9;
-            cursor: pointer;
-            font-size: 14px;
-        }
-        .timer {
-            margin-top: 10px;
-            font-size: 15px;
-            color: #555;
-        }
-    </style>
+   <style>
+/* =========================
+   Fondo general
+   ========================= */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Arial", sans-serif;
+  background: linear-gradient(0deg, #070707 0%, #253447 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+/* =========================
+   Contenedor principal 2FA
+   ========================= */
+.otp-container {
+  max-width: 450px;
+  width: 100%;
+  background: linear-gradient(0deg, #FFFFFF 0%, #F4F7FB 100%);
+  border-radius: 40px;
+  padding: 30px 40px;
+  border: 5px solid #FFFFFF;
+  box-shadow: rgba(16, 64, 87, 0.88) 0px 30px 30px -20px;
+  margin: 20px;
+  text-align: center;
+  animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+  0% { opacity: 0; transform: translateY(30px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================
+   Título
+   ========================= */
+.otp-title {
+  font-weight: 900;
+  font-size: 28px;
+  color: rgb(16, 137, 211); 
+}
+
+/* =========================
+   Contenedor de inputs OTP
+   ========================= */
+.otp-inputs {
+  display: flex;
+  justify-content: space-between;
+  margin: 30px 0;
+}
+
+.otp-input {
+  width: 60px;
+  height: 68px;
+  font-size: 28px;
+  text-align: center;
+  border: none;
+  border-radius: 20px;
+  background: white;
+  box-shadow: #1788bdff 0px 10px 10px -5px;
+  transition: all 0.2s ease;
+  border-inline: 2px solid transparent;
+}
+
+.otp-input:focus {
+  outline: none;
+  border-inline: 2px solid #12B1D1;
+  transform: scale(1.06);
+}
+
+/* =========================
+   Botón verificar
+   ========================= */
+.btn-otp {
+  display: block;
+  width: 100%;
+  font-weight: bold;
+  background: linear-gradient(45deg, rgb(16, 137, 211) 0%, rgb(18, 177, 209) 100%);
+  color: white;
+  padding-block: 15px;
+  margin-top: 10px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  box-shadow: rgba(133, 189, 215, 0.88) 0px 20px 10px -15px;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-otp:hover {
+  transform: scale(1.03);
+  box-shadow: rgba(133, 189, 215, 0.88) 0px 23px 10px -20px;
+}
+
+.btn-otp:active {
+  transform: scale(0.95);
+  box-shadow: rgba(133, 189, 215, 0.88) 0px 15px 10px -10px;
+}
+
+/* =========================
+   Reenviar código
+   ========================= */
+.resend {
+  margin-top: 15px;
+  color: #0099ff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: color .3s ease;
+}
+
+.resend:hover {
+  color: rgb(16, 137, 211);
+}
+
+/* =========================
+   Timer
+   ========================= */
+.timer {
+  margin-top: 15px;
+  font-size: 15px;
+  color: #444;
+  font-weight: bold;
+}
+
+/* =========================
+   Responsivo
+   ========================= */
+@media (max-width: 480px) {
+  .otp-container {
+    width: 90%;
+    padding: 25px 25px;
+  }
+
+  .otp-input {
+    width: 50px;
+    height: 58px;
+    font-size: 24px;
+  }
+
+  .otp-title {
+    font-size: 24px;
+  }
+}
+</style>
+
+
 
 </head>
 <body>
