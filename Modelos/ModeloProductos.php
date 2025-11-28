@@ -42,6 +42,9 @@ if ($ultimo && isset($ultimo['max_ref']) && $ultimo['max_ref'] !== null) {
     }
 }
 
+    public static function getPDO(): PDO {
+        return Conexion::pdo();
+    }
 
     public static function actualizar(int $id, array $data): bool
     {

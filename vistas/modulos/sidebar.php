@@ -23,12 +23,14 @@
             <!-- Divider -->
             <hr class="sidebar-divider">
 
-            <!-- Usuarios -->
-            <li class="nav-item">
-                <a class="nav-link" href="usuarios">
-                    <i class="fas fa-solid fa-users"></i>
-                    <span>Usuarios</span></a>
-            </li>
+            <?php if ($_SESSION["rol"] === 'administrador'):?>
+                <!-- Usuarios -->
+                <li class="nav-item">
+                    <a class="nav-link" href="usuarios">
+                        <i class="fas fa-solid fa-users"></i>
+                        <span>Usuarios</span></a>
+                </li>
+            <?php endif ;?>
 
             <!-- Divider -->
             <hr class="sidebar-divider">
@@ -39,6 +41,15 @@
             <div class="sidebar-heading">
                 Inventario
             </div>
+
+        <?php if ($_SESSION["rol"] === 'administrador'):?>
+            <li class="nav-item">
+                <a class="nav-link" href="dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+        <?php endif ;?>
 
             <!-- Categorías -->
             <li class="nav-item">
@@ -54,41 +65,8 @@
                     <span>Productos</span></a>
             </li>
 
+            
 
-            <!-- Divider -->
-            <!-- <hr class="sidebar-divider"> -->
-
-            <!-- Clientes -->
-            <!-- <li class="nav-item">
-                <a class="nav-link" href="clientes">
-                    <i class="fas fa-fw fa-user"></i>
-                    <span>Clientes</span></a>
-            </li> -->
-
-            <!-- Divider -->
-            <!-- <hr class="sidebar-divider"> -->
-
-
-            <!-- Ventas -->
-            <!-- <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
-                    aria-expanded="true" aria-controls="collapseUtilities">
-                    <i class="fas fa-fw fa-wrench"></i>
-                    <span>Ventas</span>
-                </a>
-                <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities"
-                    data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <h6 class="collapse-header">Gestión de ventas:</h6>
-                        <a class="collapse-item" href="ventas">Administrar ventas</a>
-                        <a class="collapse-item" href="crear-venta">Crear Venta</a>
-                        <a class="collapse-item" href="reportes">Reporte de Ventas</a>
-                    </div>
-                </div>
-            </li> -->
-
-            <!-- Divider -->
-            <!-- <hr class="sidebar-divider"> -->
 
             <!-- Salir -->
             <li class="nav-item">

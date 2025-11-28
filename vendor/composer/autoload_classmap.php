@@ -9,6 +9,7 @@ return array(
     'Attribute' => $vendorDir . '/symfony/polyfill-php80/Resources/stubs/Attribute.php',
     'CURLStringFile' => $vendorDir . '/symfony/polyfill-php81/Resources/stubs/CURLStringFile.php',
     'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
+    'Dompdf\\Cpdf' => $vendorDir . '/dompdf/dompdf/lib/Cpdf.php',
     'GPBMetadata\\GrpcGcp' => $vendorDir . '/google/grpc-gcp/src/generated/GPBMetadata/GrpcGcp.php',
     'Grpc\\Gcp\\AffinityConfig' => $vendorDir . '/google/grpc-gcp/src/generated/Grpc/Gcp/AffinityConfig.php',
     'Grpc\\Gcp\\AffinityConfig_Command' => $vendorDir . '/google/grpc-gcp/src/generated/Grpc/Gcp/AffinityConfig_Command.php',

@@ -1,27 +1,19 @@
 <?php
 
-// Asumiendo que las clases y la variable de sesión están disponibles.
-// require_once "Controladores/ControladorProductos.php";
-// Asume que la sesión ya fue iniciada y $_SESSION['rol'] está disponible.
-
 $productos  = ControladorProductos::mostrarProductos();
 $categorias = ControladorProductos::listarCategorias();
-
-// Asignar el rol actual (ejemplo de cómo se obtendría el rol)
-$rol_actual = $_SESSION['rol'] ?? 'invitado'; // 'invitado' por defecto si no está definido
 ?>
+<!-- Begin Page Content -->
 <div class="container-fluid">
 
+  <!-- Header -->
   <div class="d-flex align-items-center justify-content-between mb-3">
     <h1 class="h3 mb-0 text-gray-800">
       <i class="fas fa-box me-2 text-primary"></i> Productos
     </h1>
-    
-    <?php if ($rol_actual === 'administrador' || $rol_actual === 'editor'): ?>
-      <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalProducto">
-        <i class="fas fa-plus me-1"></i> Nuevo producto
-      </button>
-    <?php endif; ?>
+    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalProducto">
+      <i class="fas fa-plus me-1"></i> Nuevo producto
+    </button>
   </div>
 
   <p class="mb-4">Gestiona tus productos. Puedes subir una imagen (JPG, PNG o WEBP, máx 3 MB).</p>
@@ -45,7 +37,7 @@ $rol_actual = $_SESSION['rol'] ?? 'invitado'; // 'invitado' por defecto si no es
               <th>Categoría</th>
               <th class="text-end" style="width:120px;">Precio</th>
               <th class="text-end" style="width:90px;">Stock</th>
-              <th style="width:160px;"><i class="fas fa-cogs me-1 text-secondary"></i> Acciones</th>
+              <th style="width:160px;">Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -57,23 +49,6 @@ $rol_actual = $_SESSION['rol'] ?? 'invitado'; // 'invitado' por defecto si no es
               $precio = number_format((float)$p['precio'], 2, '.', ',');
               $stock  = (int)$p['stock'];
               $imgSrc = $img ?: 'https://via.placeholder.com/80x80?text=IMG';
-
-              // Lógica de visibilidad de botones en la fila
-              $botonesHtml = '';
-              if ($rol_actual === 'administrador') {
-                $botonesHtml .= '<button class="btn btn-outline-primary btn-sm me-1" data-action="edit" data-bs-toggle="tooltip" title="Editar">
-                                  <i class="fas fa-edit"></i>
-                                </button>';
-                $botonesHtml .= '<button class="btn btn-outline-danger btn-sm" data-action="delete" data-bs-toggle="tooltip" title="Eliminar">
-                                  <i class="fas fa-trash"></i>
-                                </button>';
-              } elseif ($rol_actual === 'editor') {
-                $botonesHtml .= '<button class="btn btn-outline-primary btn-sm me-1" data-action="edit" data-bs-toggle="tooltip" title="Editar">
-                                  <i class="fas fa-edit"></i>
-                                </button>';
-              } else {
-                $botonesHtml = '--'; // Ningún botón para otros roles (ej. 'invitado')
-              }
             ?>
             <tr data-id="<?= $id ?>"
                 data-nombre="<?= $nom ?>"
@@ -83,35 +58,41 @@ $rol_actual = $_SESSION['rol'] ?? 'invitado'; // 'invitado' por defecto si no es
                 data-stock="<?= $stock ?>"
                 data-imagen="<?= $img ?>">
               <td class="text-center"><?= $i++ ?></td>
-              <td class="text-center"><?= htmlspecialchars($p['referencia'] ?? '', ENT_QUOTES, 'UTF-8') ?></td>
-              <td class="text-center">
-                <img src="<?= $imgSrc ?>" alt="img" class="rounded" style="width:64px;height:64px;object-fit:cover;">
-              </td>
+<td class="text-center"><?= htmlspecialchars($p['referencia'] ?? '', ENT_QUOTES, 'UTF-8') ?></td>
+<td class="text-center">
+  <img src="<?= $imgSrc ?>" alt="img" class="rounded" style="width:64px;height:64px;object-fit:cover;">
+</td>
 
               <td><?= $nom ?></td>
               <td><?= $cat ?></td>
               <td class="text-end">$ <?= $precio ?></td>
               <td class="text-end"><?= $stock ?></td>
               <td class="text-center text-nowrap">
-                <?= $botonesHtml ?>
+                <button class="btn btn-outline-primary btn-sm me-1" data-action="edit" data-bs-toggle="tooltip" title="Editar">
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button class="btn btn-outline-danger btn-sm" data-action="delete" data-bs-toggle="tooltip" title="Eliminar">
+                  <i class="fas fa-trash"></i>
+                </button>
               </td>
             </tr>
             <?php endforeach; else: ?>
-            <tr><td colspan="8" class="text-center text-muted">No hay productos registrados.</td></tr>
+            <tr><td colspan="7" class="text-center text-muted">No hay productos registrados.</td></tr>
             <?php endif; ?>
           </tbody>
           <tfoot class="thead-light">
-            <tr>
-              <th>#</th>
-              <th>Referencia</th>
-              <th>Imagen</th>
-              <th>Nombre</th>
-              <th>Categoría</th>
-              <th class="text-end">Precio</th>
-              <th class="text-end">Stock</th>
-              <th>Acciones</th>
-            </tr>
-          </tfoot>
+  <tr>
+    <th>#</th>
+    <th>Referencia</th>
+    <th>Imagen</th>
+    <th>Nombre</th>
+    <th>Categoría</th>
+    <th class="text-end">Precio</th>
+    <th class="text-end">Stock</th>
+    <th>Acciones</th>
+  </tr>
+</tfoot>
+
         </table>
       </div>
     </div>

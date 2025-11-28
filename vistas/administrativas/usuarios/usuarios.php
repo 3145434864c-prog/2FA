@@ -1,4 +1,21 @@
 <?php
+
+// Validar rol
+if (!isset($_SESSION['rol']) || $_SESSION['rol'] !== 'administrador') {
+    echo '<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        Swal.fire({
+            icon: "error",
+            title: "Acceso denegado",
+            text: "No tienes permisos para acceder a esta página",
+            confirmButtonColor: "#d33"
+        }).then(() => {
+            window.location.href = "salir";
+        });
+    </script>';
+    exit;
+}
+
 require_once "Controladores/ControladorUsuarios.php";
 
 $controlador = new ControladorUsuarios();

@@ -228,44 +228,64 @@ class ControladorProductos
         }
     }
 
-    public static function eliminarProducto(): void
-    {
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['id_producto_eliminar'])) return;
+   public static function eliminarProducto(): void
+{
+    if ($_SERVER['REQUEST_METHOD'] !== 'POST' || !isset($_POST['id_producto_eliminar'])) return;
 
-        $id = (int)($_POST['id_producto_eliminar'] ?? 0);
-        if ($id <= 0) {
-            echo self::swal('Cuidado', 'ID inválido para eliminar.', 'error', 'productos');
-            return;
-        }
-
-        $actual = ModeloProductos::obtenerPorId($id);
-        if (!$actual) {
-            echo self::swal('No encontrado', 'El producto no existe.', 'error', 'productos');
-            return;
-        }
-
-        try {
-            $ok = ModeloProductos::eliminar($id);
-            if ($ok) {
-                // borra imagen si existe
-                if (!empty($actual['imagen'])) {
-                    $abs = self::pathAbsFromRel($actual['imagen']);
-                    if ($abs && is_file($abs)) @unlink($abs);
-                }
-                echo self::swal('Eliminado', 'El producto fue eliminado correctamente.', 'success', 'productos');
-            } else {
-                echo self::swal('Error', 'No fue posible eliminar.', 'error', 'productos');
-            }
-        } catch (Throwable $e) {
-            $msg = 'Ocurrió un error inesperado.';
-            if ($e instanceof PDOException) {
-                $code = (int)($e->errorInfo[1] ?? 0);
-                if ($code === 1451) $msg = 'No se puede eliminar: el producto está referenciado.';
-            }
-            error_log("ControladorProductos::eliminar => ".$e->getMessage());
-            echo self::swal('Error', $msg, 'error', 'productos');
-        }
+    $id = (int)($_POST['id_producto_eliminar'] ?? 0);
+    if ($id <= 0) {
+        echo self::swal('Cuidado', 'ID inválido para eliminar.', 'error', 'productos');
+        return;
     }
+
+    $actual = ModeloProductos::obtenerPorId($id);
+    if (!$actual) {
+        echo self::swal('No encontrado', 'El producto no existe.', 'error', 'productos');
+        return;
+    }
+
+    $pdo = ModeloProductos::getPDO();
+    $pdo->beginTransaction();
+
+    try {
+        // 1️⃣ Registrar producto eliminado
+        $stmt = $pdo->prepare("
+            INSERT INTO productos_eliminados (id_producto, nombre, id_categoria, eliminado_en)
+            VALUES (:id, :nombre, :id_categoria, NOW())
+        ");
+        $stmt->execute([
+            ':id' => $actual['id_producto'],
+            ':nombre' => $actual['nombre'],
+            ':id_categoria' => $actual['id_categoria'] ?? null
+        ]);
+
+        // 2️⃣ Eliminar producto de la tabla principal
+        $stmtDel = $pdo->prepare("DELETE FROM productos WHERE id_producto = :id");
+        $stmtDel->execute([':id' => $actual['id_producto']]);
+
+        // Confirmar transacción
+        $pdo->commit();
+
+        // 3️⃣ Borrar imagen física si existe
+        if (!empty($actual['imagen'])) {
+            $abs = self::pathAbsFromRel($actual['imagen']);
+            if ($abs && is_file($abs)) @unlink($abs);
+        }
+
+        echo self::swal('Eliminado', 'El producto fue eliminado correctamente.', 'success', 'productos');
+
+    } catch (Throwable $e) {
+        $pdo->rollBack();
+        $msg = 'Ocurrió un error inesperado.';
+        if ($e instanceof PDOException) {
+            $code = (int)($e->errorInfo[1] ?? 0);
+            if ($code === 1451) $msg = 'No se puede eliminar: el producto está referenciado.';
+        }
+        error_log("ControladorProductos::eliminar => " . $e->getMessage());
+        echo self::swal('Error', $msg, 'error', 'productos');
+    }
+}
+
 
     /* ===================== Soporte combos ===================== */
     public static function listarCategorias(): array

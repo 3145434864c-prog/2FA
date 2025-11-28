@@ -288,7 +288,10 @@ if ($enviado) {
     // ===================================================
     if (session_status() !== PHP_SESSION_ACTIVE) session_start();
 
-    $_SESSION['admin'] = $usuario['perfil_usuario'] === 'administrador' ? 'ok' : '';
+    // $_SESSION['admin'] = $usuario['perfil_usuario'] === 'administrador' ? 'ok' : '';
+    $_SESSION['admin'] = 'ok';
+    // $_SESSION['rol'] =  $usuario['perfil_usuario'] === 'administrador' ? 'administrador' : 'usuario';
+     $_SESSION['rol'] =  $usuario['perfil_usuario'];
     $_SESSION['usuario_id'] = $usuario['id_usuario'];
     $_SESSION['usuario_nombre'] = $usuario['nombre_usuario'];
     $_SESSION['usuario_foto'] = !empty($usuario['foto_usuario'])
@@ -296,7 +299,7 @@ if ($enviado) {
         : 'vistas/recursos/img/default_user.png';
 
     // Redirigir a la página de inicio
-    header('Location: inicio');
+    header('Location: dashboard');
     exit;
 }
 
