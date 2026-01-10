@@ -1,6 +1,7 @@
 # Sistema de Gestión de Inventarios – NUVA S.A.S.
 
-![Banner del proyecto](Sistema de Gestión de Inventarios  NUVA S.A.S. .png)
+![Banner de inventario](https://raw.githubusercontent.com/3145434864c-prog/2FA/bc1a8e4f624392b2188a9b17dbd366acdbb42053/inventario.png)
+
 
 ## Descripción del sistema
 El **Sistema de Gestión de Inventarios de NUVA S.A.S.** es una solución diseñada para facilitar el control y la administración de productos dentro de la empresa.  
