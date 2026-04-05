@@ -1,10 +1,10 @@
 <?php
-// Funciones2FA.php
+// Funciones2FA.php - FIXED for Linux/LAMPP
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
 require_once 'Conexion.php'; // Tu clase de conexión PDO
-require 'C:\xampp\htdocs\Entregable-main\vendor\autoload.php'; // PHPMailer via Composer
+require 'vendor/autoload.php'; // FIXED: PHPMailer via Composer - Linux path
 
 function sendOtpEmail(int $userId, string $userEmail): bool {
     $pdo = Conexion::pdo();
@@ -112,7 +112,6 @@ function sendOtpEmail(int $userId, string $userEmail): bool {
 </body>
 </html>';
 
-
         $mail->send();
         return true;
     } catch (Exception $e) {
@@ -120,3 +119,5 @@ function sendOtpEmail(int $userId, string $userEmail): bool {
         return false;
     }
 }
+?>
+

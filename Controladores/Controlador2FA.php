@@ -141,9 +141,16 @@ class Controlador2FA
 
             $pdo->commit();
 
+            // Update 2FA trust info
+            require_once __DIR__ . '/../Modelos/ModeloUsuarios.php';
+            $currIp = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+            $agentHash = hash('sha256', ($_SERVER['HTTP_USER_AGENT'] ?? '') . ($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? ''));
+            ModeloUsuarios::update2FATrust($userId, $currIp, $agentHash);
+
             // Redirigir EXACTAMENTE como pediste
             header('Location: index.php?route=dashboard');
             exit;
+
         } catch (Exception $e) {
             if ($pdo->inTransaction()) $pdo->rollBack();
             error_log("Error al completar 2FA: " . $e->getMessage());
@@ -225,7 +232,8 @@ class Controlador2FA
      */
     private function incrementFailAndRespond(int $userId, string $title, string $message): void
     {
-        // Incrementar intentos en sesión
+        // Incrementar intentos en DB and session
+        ModeloUsuarios::incrementFailed2FA($userId);
         if (!isset($_SESSION['2fa_failed_attempts'])) {
             $_SESSION['2fa_failed_attempts'] = 0;
         }
@@ -241,6 +249,7 @@ class Controlador2FA
         $remaining = $this->MAX_FAILED_ATTEMPTS - (int)$_SESSION['2fa_failed_attempts'];
         $this->swalAndExit('error', $title, $message . " Te quedan {$remaining} intentos.");
     }
+
 
     /**
      * Envía una respuesta simple usando SweetAlert2 y redirige a la vista 2fa (misma ruta).

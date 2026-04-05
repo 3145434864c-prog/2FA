@@ -30,12 +30,8 @@ class ModeloUsuarios {
         }
 
         // Ya viene hasheado desde el controlador, pero validamos que sea seguro
-        if (!str_starts_with($password, '$argon2id$')) {
-            $password = password_hash($password, PASSWORD_ARGON2ID, [
-                'memory_cost' => 1 << 17,
-                'time_cost'   => 4,
-                'threads'     => 2
-            ]);
+        if (!str_starts_with($password, '$argon2id$') && !str_starts_with($password, '$2y$')) {
+            $password = password_hash($password, defined('PASSWORD_ARGON2ID') ? PASSWORD_ARGON2ID : PASSWORD_DEFAULT);
         }
 
         // Insertar en DB
@@ -84,8 +80,8 @@ class ModeloUsuarios {
         $campos = "nombre_usuario = :nombre, email_usuario = :email, perfil_usuario = :perfil, estado_usuario = :estado, foto_usuario = :foto";
         if ($password) {
             // Si no está hasheada, la hasheamos
-            if (!str_starts_with($password, '$argon2id$')) {
-                $password = password_hash($password, PASSWORD_ARGON2ID);
+            if (!str_starts_with($password, '$argon2id$') && !str_starts_with($password, '$2y$')) {
+                $password = password_hash($password, defined('PASSWORD_ARGON2ID') ? PASSWORD_ARGON2ID : PASSWORD_DEFAULT);
             }
             $campos .= ", password_usuario = :password";
         }
@@ -108,9 +104,7 @@ class ModeloUsuarios {
         }
     }
 
-    // =======================================
-    // Eliminar usuario
-    // =======================================
+    // ... resto igual
     public static function eliminar(int $id): bool {
         $usuario = self::findById($id);
         if (!$usuario) return false;
@@ -132,9 +126,6 @@ class ModeloUsuarios {
         }
     }
 
-    // =======================================
-    // Obtener usuario por ID
-    // =======================================
     public static function findById(int $id): ?array {
         $sql = "SELECT * FROM usuarios WHERE id_usuario = :id LIMIT 1";
         try {
@@ -149,9 +140,6 @@ class ModeloUsuarios {
         }
     }
 
-    // =======================================
-    // Buscar usuario por email
-    // =======================================
     public static function findByEmail(string $email): ?array {
         $sql = "SELECT * FROM usuarios WHERE email_usuario = :email LIMIT 1";
         try {
@@ -166,9 +154,6 @@ class ModeloUsuarios {
         }
     }
 
-    // =======================================
-    // Listar usuarios
-    // =======================================
     public static function listar(): array {
         $sql = "SELECT id_usuario, nombre_usuario, email_usuario, perfil_usuario, estado_usuario, foto_usuario, fyh_creacion_usuario 
                 FROM usuarios ORDER BY id_usuario DESC";
@@ -180,9 +165,6 @@ class ModeloUsuarios {
         }
     }
 
-    // =======================================
-    // Funciones adicionales (recuperación)
-    // =======================================
     public static function mdlBuscarUsuarioPorEmail($email) {
         $stmt = Conexion::pdo()->prepare("SELECT * FROM usuarios WHERE email_usuario = :email LIMIT 1");
         $stmt->bindParam(":email", $email, PDO::PARAM_STR);
@@ -204,4 +186,114 @@ class ModeloUsuarios {
         $stmt->bindParam(":user_agent", $data["user_agent"], PDO::PARAM_STR);
         return $stmt->execute();
     }
+
+    // ================================
+    // 2FA TRUST PERIOD METHODS
+    // ================================
+
+    /**
+     * Update trust info after successful 2FA
+     */
+    public static function update2FATrust(int $userId, string $ip, string $agentHash): bool {
+        $sql = "
+            UPDATE usuarios SET 
+                ultimo_2fa_success = NOW(),
+                ultimo_ip = :ip,
+                ultimo_user_agent_hash = :hash,
+                failed_attempts_2fa = 0,
+                is_blocked_until = NULL
+            WHERE id_usuario = :id
+        ";
+        try {
+            $stmt = Conexion::pdo()->prepare($sql);
+            $stmt->bindValue(':id', $userId, PDO::PARAM_INT);
+            $stmt->bindValue(':ip', $ip, PDO::PARAM_STR);
+            $stmt->bindValue(':hash', $agentHash, PDO::PARAM_STR);
+            return $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Error update2FATrust: " . $e->getMessage());
+            return false;
+        }
+    }
+
+    /**
+     * Get current trust status
+     */
+    public static function getTrustInfo(int $userId): ?array {
+        $sql = "SELECT ultimo_2fa_success, ultimo_ip, ultimo_user_agent_hash, failed_attempts_2fa, is_blocked_until FROM usuarios WHERE id_usuario = :id LIMIT 1";
+        try {
+            $stmt = Conexion::pdo()->prepare($sql);
+            $stmt->bindValue(':id', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+        } catch (PDOException $e) {
+            error_log("Error getTrustInfo: " . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Check if device is trusted within 24h
+     * Returns true only if trusted AND not sensitive AND no changes/block
+     */
+    public static function isTrustedWithin24h(int $userId, string $currIp, string $currHash, bool $isSensitive = false): bool {
+        $trust = self::getTrustInfo($userId);
+        if (!$trust || !$trust['ultimo_2fa_success']) {
+            return false;
+        }
+
+        $lastSuccess = strtotime($trust['ultimo_2fa_success']);
+        $now = time();
+        if (($now - $lastSuccess) > 86400) { // 24 hours
+            return false;
+        }
+
+        // Check changes
+        if ($trust['ultimo_ip'] !== $currIp || $trust['ultimo_user_agent_hash'] !== $currHash) {
+            return false;
+        }
+
+        // Check block/fails
+        if ($trust['failed_attempts_2fa'] >= 5 || ($trust['is_blocked_until'] && strtotime($trust['is_blocked_until']) > $now)) {
+            return false;
+        }
+
+        // Sensitive always requires fresh 2FA
+        if ($isSensitive) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Increment failed 2FA attempt
+     */
+    public static function incrementFailed2FA(int $userId): void {
+        $sql = "UPDATE usuarios SET failed_attempts_2fa = failed_attempts_2fa + 1 WHERE id_usuario = :id";
+        try {
+            $stmt = Conexion::pdo()->prepare($sql);
+            $stmt->bindValue(':id', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Error incrementFailed2FA: " . $e->getMessage());
+        }
+    }
+
+    /**
+     * Reset failed attempts (optional cron or after success)
+     */
+    public static function resetFailed2FA(int $userId): void {
+        $sql = "UPDATE usuarios SET failed_attempts_2fa = 0, is_blocked_until = NULL WHERE id_usuario = :id";
+        try {
+            $stmt = Conexion::pdo()->prepare($sql);
+            $stmt->bindValue(':id', $userId, PDO::PARAM_INT);
+            $stmt->execute();
+        } catch (PDOException $e) {
+            error_log("Error resetFailed2FA: " . $e->getMessage());
+        }
+    }
 }
+?>
+
+

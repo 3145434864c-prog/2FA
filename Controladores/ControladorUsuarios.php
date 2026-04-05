@@ -40,8 +40,8 @@ public function crearUsuario(): array {
         move_uploaded_file($foto['tmp_name'], $rutaFoto);
     }
 
-    // Hash de la contraseña utilizando Argon2id
-    $passwordHash = password_hash($password, PASSWORD_ARGON2ID, [
+    // Hash de la contraseña utilizando Argon2id (fallback PASSWORD_DEFAULT)
+    $passwordHash = password_hash($password, defined('PASSWORD_ARGON2ID') ? PASSWORD_ARGON2ID : PASSWORD_DEFAULT, [
     'memory_cost' => 1 << 17, // 128 MB
     'time_cost'   => 4,
     'threads'     => 2
@@ -127,7 +127,7 @@ if ($password !== '') {
     }
 
     // Si es válida, generar el hash
-    $datosActualizar['password_usuario'] = password_hash($password, PASSWORD_ARGON2ID, [
+    $datosActualizar['password_usuario'] = password_hash($password, defined('PASSWORD_ARGON2ID') ? PASSWORD_ARGON2ID : PASSWORD_DEFAULT, [
         'memory_cost' => 1 << 17,
         'time_cost'   => 4,
         'threads'     => 2
@@ -262,9 +262,28 @@ public function ingresoUsuario(): void {
         exit;
     }
 
+    // Check 2FA trust before requiring OTP
+    $userId = $usuario['id_usuario'];
+    $currIp = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    $agentHash = hash('sha256', ($_SERVER['HTTP_USER_AGENT'] ?? '') . ($_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? ''));
+    if (ModeloUsuarios::isTrustedWithin24h($userId, $currIp, $agentHash, false)) {
+        // Device trusted: set full session directly
+        if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+        $_SESSION['admin'] = 'ok';
+        $_SESSION['rol'] = $usuario['perfil_usuario'];
+        $_SESSION['usuario_id'] = $userId;
+        $_SESSION['usuario_nombre'] = $usuario['nombre_usuario'];
+        $_SESSION['usuario_foto'] = !empty($usuario['foto_usuario'])
+            ? $usuario['foto_usuario']
+            : 'vistas/recursos/img/default_user.png';
+        header('Location: index.php?route=dashboard');
+        exit;
+    }
+
 require_once "Modelos/Funciones2FA.php";
 
 $enviado = sendOtpEmail($usuario['id_usuario'], $usuario['email_usuario']);
+
 
 if ($enviado) {
     // Guardar temporalmente el ID de usuario en sesión para 2FA
@@ -451,12 +470,8 @@ public function actualizarPassword()
         return;
     }
 
-    // Hashear nueva contraseña con Argon2ID
-    $nuevoHash = password_hash($password, PASSWORD_ARGON2ID, [
-        'memory_cost' => 1 << 17,
-        'time_cost'   => 4,
-        'threads'     => 2
-    ]);
+    // Hashear nueva contraseña (FIX: defined check + fallback)
+    $nuevoHash = password_hash($password, defined('PASSWORD_ARGON2ID') ? PASSWORD_ARGON2ID : PASSWORD_DEFAULT);
 
     // Iniciar transacción
     $db = Conexion::pdo();
@@ -506,3 +521,4 @@ public function actualizarPassword()
 
 }
 ?>
+

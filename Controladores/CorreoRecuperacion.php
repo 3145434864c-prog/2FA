@@ -12,10 +12,10 @@ class CorreoRecuperacion {
         try {
             // Configuración SMTP
             $mail->isSMTP();
-            $mail->Host       = 'smtp.gmail.com'; // servidor SMTP
+            $mail->Host       = 'smtp.gmail.com';
             $mail->SMTPAuth   = true;
-            $mail->Username   = '3145434864c@gmail.com'; // tu correo
-            $mail->Password   = 'ayvrxdvuugoizdna'; // clave o app password
+            $mail->Username   = '3145434864c@gmail.com';
+            $mail->Password   = 'ayvrxdvuugoizdna'; // app password
             $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
             $mail->Port       = 587;
 
@@ -25,9 +25,8 @@ class CorreoRecuperacion {
             $mail->isHTML(true);
             $mail->Subject = 'Recupera tu contraseña';
 
-            // URL al formulario de restablecimiento
-           $url = "http://localhost/entregable-main/recuperar_confirmar?selector=" . urlencode($selector) . "&token=" . urlencode($token);
-
+            // FIXED URL - actual path /2FA
+            $url = "http://localhost/2FA/index.php?route=recuperar_confirmar&selector=" . urlencode($selector) . "&token=" . urlencode($token);
 
             // Cuerpo del mensaje
             $mail->Body = "
@@ -56,7 +55,6 @@ class CorreoRecuperacion {
     </div>
 ";
 
-
             $mail->send();
             return true;
 
@@ -66,3 +64,5 @@ class CorreoRecuperacion {
         }
     }
 }
+?>
+

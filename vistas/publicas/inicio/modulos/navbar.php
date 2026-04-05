@@ -18,9 +18,9 @@
 	 <h1 id="logo"><a href="inicio">NUVA S.A.S</a></h1>
 	<nav id="nav">
 	<ul>
-		<li><a href="inicio">inicio</a></li>
-		<li><a href="equipo">Equipo</a></li>
-		<li><a href="productos">Productos</a></li>
+		<li><a href="inicio" class="button primary">inicio</a></li>
+		<li><a href="equipo" class="button primary">Equipo</a></li>
+		<li><a href="productos" class="button primary">Productos</a></li>
 		<li><a href="ingreso" class="button primary">Ingreso</a></li>
 		
 	</ul>
