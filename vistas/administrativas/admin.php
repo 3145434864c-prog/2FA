@@ -30,6 +30,7 @@
                             $_GET["route"] == "ventas" || 
                             $_GET["route"] == "crear-venta" || 
                             $_GET["route"] == "reportes" ||
+                            $_GET["route"] == "chatbot" ||
                             $_GET["route"] == "salir"
 
                         ){
@@ -37,6 +38,7 @@
                         }else{
                             include_once "vistas/404/404.php";
                         }
+
 
                     }else{
                         include_once "vistas/administrativas/productos/productos.php";

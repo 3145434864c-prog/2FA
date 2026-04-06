@@ -83,10 +83,17 @@ if (isset($_GET['ruta']) && $_GET['ruta'] === 'contacto_enviar') {
     exit; // importante para que no cargue la plantilla
 }
 
+// 🔹 ROUTE CHATBOT API (solo POST)
+if (isset($_GET['route']) && $_GET['route'] === 'chatbot' && $_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once "Controladores/ControladorChatbot.php";
+    ControladorChatbot::procesar();
+    exit;
+}
 
 
 $plantilla = new ControladorPlantilla();
 $plantilla -> mostrarPlantilla();
+
 
 ?>
 

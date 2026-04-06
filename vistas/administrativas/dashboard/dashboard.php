@@ -161,6 +161,8 @@ body { font-family: 'Nunito', sans-serif; background: #f8f9fc; }
                     </div>
                 </div>
 
+
+
                 <div class="col-md-3 mt-3">
                     <div class="card border-left-secondary shadow kpi-card">
                         <div class="card-body">
@@ -171,6 +173,7 @@ body { font-family: 'Nunito', sans-serif; background: #f8f9fc; }
                     </div>
                 </div>
             </div>
+
 
             <!-- Tablas -->
            <!-- Tablas -->

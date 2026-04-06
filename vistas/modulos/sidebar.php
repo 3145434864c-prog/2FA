@@ -65,8 +65,13 @@
                     <span>Productos</span></a>
             </li>
 
-            
-
+            <!-- Asistente IA -->
+            <li class="nav-item">
+                <a class="nav-link" href="chatbot">
+                    <i class="fas fa-robot"></i>
+                    <span>Asistente IA</span>
+                </a>
+            </li>
 
             <!-- Salir -->
             <li class="nav-item">
