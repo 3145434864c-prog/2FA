@@ -1,9 +1,11 @@
 {
     "require": {
+        "php": "^8.2.0",
         "phpmailer/phpmailer": "^7.0",
         "kreait/firebase-php": "^5.26",
         "vlucas/phpdotenv": "^5.6",
-        "spomky-labs/otphp": "^11.3",
-        "dompdf/dompdf": "^3.1"
+        "spomky-labs/otphp": "^10.0",
+        "dompdf/dompdf": "^3.1",
+        "ralouphie/getallheaders": "^3.0"
     }
 }
